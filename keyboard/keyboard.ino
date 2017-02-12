@@ -177,13 +177,3 @@ void scan() {
     digitalWrite(matrix[i][0], HIGH);
   }
 }
-  
-//  if (digitalRead(COL1) == LOW) {
-//    digitalWrite(DEBUG_LED, HIGH);
-//  } else if (digitalRead(COL2) == LOW) {
-//    digitalWrite(DEBUG_LED, HIGH);
-//  } else if (digitalRead(COL3) == LOW) {
-//    digitalWrite(DEBUG_LED, HIGH);
-//  }
-
-//}
