@@ -3,14 +3,18 @@
 class Button {
   public:
     Button(byte row, byte col, char value);
+
     void setRow(byte row);
     void setCol(byte col);
     byte getRow();
     byte getCol();
+
     void setState(boolean state);
     boolean getState();
+    
     void pressed();
     void released();
+
     char getValue();
 
   private:
@@ -61,4 +65,3 @@ void Button::released() {
 char Button::getValue() {
   return _value;
 }
-
