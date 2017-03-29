@@ -1,7 +1,10 @@
 #include <Keypad.h>
+#include <Adafruit_NeoPixel.h>
 // Custom definitions for Super and Hyper modifier
 #define KEY_SUPER 0
 #define KEY_HYPER -1
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(30, 23, NEO_GRB + NEO_KHZ800);
 
 const byte ROWS = 5; // Five rows
 const byte COLS = 14; // Fourteen columns
@@ -11,8 +14,8 @@ char keys[ROWS][COLS] = {
   {KEY_ESC,       KEY_1,    KEY_2,        KEY_3,    KEY_4, KEY_5, KEY_6,    KEY_7, KEY_8,    KEY_9,     KEY_0,        KEY_MINUS,     KEY_EQUAL,      KEY_DELETE},
   {KEY_TAB,       KEY_Q,    KEY_W,        KEY_E,    KEY_R, KEY_T, KEY_Y,    KEY_U, KEY_I,    KEY_O,     KEY_P,        KEY_LEFT_BRACE,KEY_RIGHT_BRACE,KEY_BACKSPACE},
   {KEY_CAPS_LOCK, KEY_A,    KEY_S,        KEY_D,    KEY_F, KEY_G, KEY_H,    KEY_J, KEY_K,    KEY_L,     KEY_SEMICOLON,KEY_QUOTE,     KEY_ENTER,      KEY_TILDE},
-  {KEY_LEFT_SHIFT,KEY_Z,    KEY_X,        KEY_C,    KEY_V, KEY_B, KEY_N,    KEY_M, KEY_COMMA,KEY_PERIOD,KEY_SLASH,    KEY_BACKSLASH, KEY_UP,         KEY_LEFT_SHIFT},
-  {KEY_LEFT_CTRL, KEY_SUPER,KEY_RIGHT_ALT,KEY_SPACE,'1',   '2',   KEY_SPACE,'4',   '4',      KEY_SUPER ,KEY_HYPER,    KEY_LEFT,      KEY_DOWN,       KEY_RIGHT},
+  {KEY_LEFT_SHIFT,KEY_Z,    KEY_X,        KEY_C,    KEY_V, KEY_B, KEY_N,    KEY_M, KEY_COMMA,KEY_PERIOD,KEY_SLASH,    KEY_BACKSLASH, KEY_UP,         KEY_PRINTSCREEN},
+  {KEY_LEFT_CTRL, KEY_RIGHT_GUI,KEY_RIGHT_ALT,KEY_SPACE,'1',   '2',   KEY_SPACE,'4',   '4',      KEY_SUPER ,KEY_HYPER,    KEY_LEFT,      KEY_DOWN,       KEY_RIGHT},
 };
 
 // Pins for rows and columns
@@ -26,6 +29,10 @@ void setup() {
   kpd.setHoldTime(500);
   pinMode(13, OUTPUT);
   digitalWrite(13, LOW);
+
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+  colorWipe(strip.Color(61'0, 10, 220), 5);
 }
 
 void loop() {
@@ -53,6 +60,11 @@ void loop() {
             // Alt key modifier pressed
             else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
               Keyboard.set_modifier(MODIFIERKEY_ALT);
+              Keyboard.send_now();
+            }
+            // GUI key modifier pressed
+            else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
+              Keyboard.set_modifier(MODIFIERKEY_GUI);
               Keyboard.send_now();
             }
             // Super key modifier pressed
@@ -90,6 +102,11 @@ void loop() {
             }
             // Alt key modifier released
             else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
+              Keyboard.set_modifier(0);
+              Keyboard.send_now();
+            }
+            // GUI key modifier released
+            else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
               Keyboard.set_modifier(0);
               Keyboard.send_now();
             }
@@ -170,6 +187,14 @@ void releaseKeys(int i) {
   }
 }
 
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
 
 
 
