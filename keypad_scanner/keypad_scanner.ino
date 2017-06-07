@@ -74,11 +74,33 @@ void loop() {
       // Check for KEY_SUPER
       if (kpd.key[i].kchar == char(KEY_SUPER)) {
         superLayer.getKeys();
+
+        for (int j = 0; j < 6; j++) {
+
+          switch (superLayer.key[j].kstate) {
+
+            case PRESSED:
+              setKeysSuper(j);
+              Keyboard.send_now();
+              break;
+
+            case HOLD:
+              Keyboard.send_now();
+              break;
+
+            case RELEASED:
+              releaseKeysSuper(j);
+              Keyboard.send_now();
+
+            case IDLE:
+              break;
+          }
+        }
       }
 
       
       // Only find keys that have changed state.
-      if (kpd.key[i].stateChanged) {
+      else if (kpd.key[i].stateChanged) {
         // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
         switch (kpd.key[i].kstate) {
 
@@ -163,62 +185,86 @@ void loop() {
   }
 }
 
+
 // Set Keyboard register with keys from kpd layer
 void setKeys(int i) {
-  if (i == 0) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+  if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    if (i == 0) {
       Keyboard.set_key1(kpd.key[i].kchar);
-    }
-  } else if (i == 1) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 1) {
       Keyboard.set_key2(kpd.key[i].kchar);
-    }
-  } else if (i == 2) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 2) {
       Keyboard.set_key3(kpd.key[i].kchar);
-    }
-  } else if (i == 3) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 3) {
       Keyboard.set_key4(kpd.key[i].kchar);
-    }
-  } else if (i == 4) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 4) {
       Keyboard.set_key5(kpd.key[i].kchar);
-    }
-  } else if (i == 5) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 5) {
       Keyboard.set_key6(kpd.key[i].kchar);
     }
   }
-
 }
+
+
+// Set Keyboard register with 0's for released keys
 void releaseKeys(int i) {
-  if (i == 0) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+  if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    if (i == 0) {
       Keyboard.set_key1(0);
-    }
-  } else if (i == 1) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 1) {
       Keyboard.set_key2(0);
-    }
-  } else if (i == 2) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 2) {
       Keyboard.set_key3(0);
-    }
-  } else if (i == 3) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 3) {
       Keyboard.set_key4(0);
-    }
-  } else if (i == 4) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 4) {
       Keyboard.set_key5(0);
-    }
-  } else if (i == 5) {
-    if (!((kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) | (kpd.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    } else if (i == 5) {
       Keyboard.set_key6(0);
     }
   }
 }
+
+
+// Set Keyboard register with keys from super layer
+void setKeysSuper(int i) {
+  if (!((superLayer.key[i].kchar == char(KEY_LEFT_SHIFT)) | (superLayer.key[i].kchar == char(KEY_LEFT_CTRL)) | (superLayer.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    if (i == 0) {
+      Keyboard.set_key1(superLayer.key[i].kchar);
+    } else if (i == 1) {
+      Keyboard.set_key2(superLayer.key[i].kchar);
+    } else if (i == 2) {
+      Keyboard.set_key3(superLayer.key[i].kchar);
+    } else if (i == 3) {
+      Keyboard.set_key4(superLayer.key[i].kchar);
+    } else if (i == 4) {
+      Keyboard.set_key5(superLayer.key[i].kchar);
+    } else if (i == 5) {
+      Keyboard.set_key6(superLayer.key[i].kchar);
+    }
+  }
+}
+
+
+// Set Keyboard register with 0's for released keys
+void releaseKeysSuper(int i) {
+  if (!((superLayer.key[i].kchar == char(KEY_LEFT_SHIFT)) | (superLayer.key[i].kchar == char(KEY_LEFT_CTRL)) | (superLayer.key[i].kchar == char(KEY_LEFT_CTRL)))) {
+    if (i == 0) {
+      Keyboard.set_key1(0);
+    } else if (i == 1) {
+      Keyboard.set_key2(0);
+    } else if (i == 2) {
+      Keyboard.set_key3(0);
+    } else if (i == 3) {
+      Keyboard.set_key4(0);
+    } else if (i == 4) {
+      Keyboard.set_key5(0);
+    } else if (i == 5) {
+      Keyboard.set_key6(0);
+    }
+  }
+}
+
 
 // Fill the leds one after the other with a color
 void colorWipe(uint32_t c, uint8_t wait) {
