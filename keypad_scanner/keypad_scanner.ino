@@ -49,6 +49,8 @@ byte colPins[COLS] = {5,6,7,8,9,10,11,12,14,15,16,17,18,19}; //connect to the co
 Keypad kpd = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 Keypad superLayer = Keypad(makeKeymap(superKeys), rowPins, colPins, ROWS, COLS);
 
+boolean superLayerActive = false;
+
 void setup() {
   // Adjust keyboard sensitivity
   kpd.setHoldTime(500);
@@ -62,126 +64,25 @@ void setup() {
   strip.begin();
   //strip.show(); // Initialize all pixels to 'off'
   colorWipe(strip.Color(55, 0, 255), 1);
+  
 }
 
 void loop() {
-  // Fills kpd.key[] array with up-to 6 active keys.
-  // Returns true if there are ANY active keys.
-  if (kpd.getKeys()) {
-     // Scan the whole key list.
-    for (int i = 0; i < 6; i++) {
 
+  if (kpd.getKeys()) {
+    for (int i = 0; i < 6 && !superLayerActive; i++) {
       // Check for KEY_SUPER
       if (kpd.key[i].kchar == char(KEY_SUPER)) {
-        superLayer.getKeys();
-
-        for (int j = 0; j < 6; j++) {
-
-          switch (superLayer.key[j].kstate) {
-
-            case PRESSED:
-              setKeysSuper(j);
-              Keyboard.send_now();
-              break;
-
-            case HOLD:
-              Keyboard.send_now();
-              break;
-
-            case RELEASED:
-              releaseKeysSuper(j);
-              Keyboard.send_now();
-
-            case IDLE:
-              break;
-          }
-        }
-      }
-
-      
-      // Only find keys that have changed state.
-      else if (kpd.key[i].stateChanged) {
-        // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
-        switch (kpd.key[i].kstate) {
-
-          // Places pressed keys in Keyboard register
-          case PRESSED:
-            // Shift key modifier pressed
-            if (kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) {
-              Keyboard.set_modifier(MODIFIERKEY_SHIFT);
-              Keyboard.send_now();
-            }
-            // Control key modifier pressed
-            else if (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) {
-              Keyboard.set_modifier(MODIFIERKEY_CTRL);
-              Keyboard.send_now();
-            }
-            // Alt key modifier pressed
-            else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
-              Keyboard.set_modifier(MODIFIERKEY_ALT);
-              Keyboard.send_now();
-            }
-            // GUI key modifier pressed
-            else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
-              Keyboard.set_modifier(MODIFIERKEY_GUI);
-              Keyboard.send_now();
-            }
-            // Super key modifier pressed
-            //else if (kpd.key[i].kchar == char(KEY_SUPER)) {
-              //Keyboard.press(KEY_MEDIA_VOLUME_INC);
-              //Keyboard.release(KEY_MEDIA_VOLUME_INC);
-            //}
-            // Set and send keys
-            setKeys(i);
-            Keyboard.send_now();
-            break;
-
-          // Leaves Keyboard register unchanged
-          case HOLD:
-            Keyboard.send_now();
-            break;
-
-          // Removes keys from the Keyboard register
-          case RELEASED:
-            // Shift key modifier released
-            if (kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) {
-              Keyboard.set_modifier(0);
-              Keyboard.send_now();
-            }
-            // Control key modifier released
-            else if (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) {
-              Keyboard.set_modifier(0);
-              Keyboard.send_now();
-            }
-            // Alt key modifier released
-            else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
-              Keyboard.set_modifier(0);
-              Keyboard.send_now();
-            }
-            // GUI key modifier released
-            else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
-              Keyboard.set_modifier(0);
-              Keyboard.send_now();
-            }
-            // Super key modifier released
-            else if (kpd.key[i].kchar == char(KEY_SUPER)) {
-              Keyboard.release(KEY_MEDIA_VOLUME_INC);
-            }
-            // Hyper key modifier released
-            else if (kpd.key[i].kchar == char(KEY_HYPER)) {
-              Keyboard.release(KEY_MEDIA_VOLUME_DEC);
-            }
-            // Set and send keys
-            releaseKeys(i);
-            Keyboard.send_now();
-            break;
-
-          // Nothing is happening
-          case IDLE:
-            break;
-        }
+        superLayerActive = true;
       }
     }
+  }
+
+  if (superLayerActive) {
+    checkSuperLayer();
+    superLayerActive = false;
+  } else {
+    checkRegLayer();
   }
 }
 
@@ -264,6 +165,132 @@ void releaseKeysSuper(int i) {
     }
   }
 }
+
+
+// Check reg layer object for key changes and push them to the Keyboard register
+void checkRegLayer() {
+  if (kpd.getKeys()) {
+  for (int i = 0; i < 6; i++) {
+
+  // Only find keys that have changed state.
+    if (kpd.key[i].stateChanged) {
+      // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
+      switch (kpd.key[i].kstate) {
+
+        // Places pressed keys in Keyboard register
+        case PRESSED:
+          // Shift key modifier pressed
+          if (kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) {
+            Keyboard.set_modifier(MODIFIERKEY_SHIFT);
+            Keyboard.send_now();
+          }
+          // Control key modifier pressed
+          else if (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) {
+            Keyboard.set_modifier(MODIFIERKEY_CTRL);
+            Keyboard.send_now();
+          }
+          // Alt key modifier pressed
+          else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
+            Keyboard.set_modifier(MODIFIERKEY_ALT);
+            Keyboard.send_now();
+          }
+          // GUI key modifier pressed
+          else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
+            Keyboard.set_modifier(MODIFIERKEY_GUI);
+            Keyboard.send_now();
+          }
+          // Super key modifier pressed
+          //else if (kpd.key[i].kchar == char(KEY_SUPER)) {
+            //Keyboard.press(KEY_MEDIA_VOLUME_INC);
+            //Keyboard.release(KEY_MEDIA_VOLUME_INC);
+          //}
+          // Set and send keys
+          setKeys(i);
+          Keyboard.send_now();
+          break;
+
+        // Leaves Keyboard register unchanged
+        case HOLD:
+          Keyboard.send_now();
+          break;
+
+        // Removes keys from the Keyboard register
+        case RELEASED:
+          // Shift key modifier released
+          if (kpd.key[i].kchar == char(KEY_LEFT_SHIFT)) {
+            Keyboard.set_modifier(0);
+            Keyboard.send_now();
+          }
+          // Control key modifier released
+          else if (kpd.key[i].kchar == char(KEY_LEFT_CTRL)) {
+            Keyboard.set_modifier(0);
+            Keyboard.send_now();
+          }
+          // Alt key modifier released
+          else if (kpd.key[i].kchar == char(KEY_RIGHT_ALT)) {
+            Keyboard.set_modifier(0);
+            Keyboard.send_now();
+          }
+          // GUI key modifier released
+          else if (kpd.key[i].kchar == char(KEY_RIGHT_GUI)) {
+            Keyboard.set_modifier(0);
+            Keyboard.send_now();
+          }
+          // Super key modifier released
+          else if (kpd.key[i].kchar == char(KEY_SUPER)) {
+            Keyboard.release(KEY_MEDIA_VOLUME_INC);
+          }
+          // Hyper key modifier released
+          else if (kpd.key[i].kchar == char(KEY_HYPER)) {
+            Keyboard.release(KEY_MEDIA_VOLUME_DEC);
+          }
+          // Set and send keys
+          releaseKeys(i);
+          Keyboard.send_now();
+          break;
+
+        // Nothing is happening
+        case IDLE:
+          break;
+      }
+    }
+  }
+  }
+}
+
+
+// Check super layer object for key changes and push them to the Keyboard register
+void checkSuperLayer() {
+  if (superLayer.getKeys()) {
+  for (int i = 0; i < 6; i++) {
+    
+    if (superLayer.key[i].stateChanged) {
+
+      switch (superLayer.key[i].kstate) {
+
+        case PRESSED:
+          setKeysSuper(i);
+          Keyboard.send_now();
+          break;
+
+        case HOLD:
+          Keyboard.send_now();
+          break;
+
+        case RELEASED:
+          releaseKeysSuper(i);
+          Keyboard.send_now();
+
+        case IDLE:
+          break;
+      }
+    }
+  }
+  }
+}
+
+
+
 
 
 // Fill the leds one after the other with a color
