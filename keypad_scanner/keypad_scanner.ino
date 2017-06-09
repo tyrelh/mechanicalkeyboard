@@ -15,7 +15,7 @@ const byte ROWS = 5; // Five rows
 const byte COLS = 14; // Fourteen columns
 
 // Keymap
-char keys[ROWS][COLS] = {
+char keys[ROWS][COLS] ={
   {KEY_ESC,       KEY_1,    KEY_2,        KEY_3,    KEY_4, KEY_5, KEY_6,    KEY_7, KEY_8,    KEY_9,     KEY_0,        KEY_MINUS,     KEY_EQUAL,      KEY_DELETE},
   {KEY_TAB,       KEY_Q,    KEY_W,        KEY_E,    KEY_R, KEY_T, KEY_Y,    KEY_U, KEY_I,    KEY_O,     KEY_P,        KEY_LEFT_BRACE,KEY_RIGHT_BRACE,KEY_BACKSPACE},
   {KEY_CAPS_LOCK, KEY_A,    KEY_S,        KEY_D,    KEY_F, KEY_G, KEY_H,    KEY_J, KEY_K,    KEY_L,     KEY_SEMICOLON,KEY_QUOTE,     KEY_ENTER,      KEY_TILDE},
@@ -169,7 +169,6 @@ void releaseKeysSuper(int i) {
 
 // Check reg layer object for key changes and push them to the Keyboard register
 void checkRegLayer() {
-  if (kpd.getKeys()) {
   for (int i = 0; i < 6; i++) {
 
   // Only find keys that have changed state.
@@ -236,14 +235,14 @@ void checkRegLayer() {
             Keyboard.set_modifier(0);
             Keyboard.send_now();
           }
-          // Super key modifier released
-          else if (kpd.key[i].kchar == char(KEY_SUPER)) {
-            Keyboard.release(KEY_MEDIA_VOLUME_INC);
-          }
-          // Hyper key modifier released
-          else if (kpd.key[i].kchar == char(KEY_HYPER)) {
-            Keyboard.release(KEY_MEDIA_VOLUME_DEC);
-          }
+//          // Super key modifier released
+//          else if (kpd.key[i].kchar == char(KEY_SUPER)) {
+//            Keyboard.release(KEY_MEDIA_VOLUME_INC);
+//          }
+//          // Hyper key modifier released
+//          else if (kpd.key[i].kchar == char(KEY_HYPER)) {
+//            Keyboard.release(KEY_MEDIA_VOLUME_DEC);
+//          }
           // Set and send keys
           releaseKeys(i);
           Keyboard.send_now();
@@ -254,7 +253,6 @@ void checkRegLayer() {
           break;
       }
     }
-  }
   }
 }
 
